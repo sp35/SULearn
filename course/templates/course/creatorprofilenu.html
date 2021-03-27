@@ -1,0 +1,36 @@
+{% extends "user/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="content-section">
+      <div class="media">
+        <img class="rounded-circle account-img" src="{{ creatorprofile.image.url }}">
+      </div>
+        <div class="media-body">
+          <h2 class="account-heading">{{ creatorprofile.user.username }}</h2>
+            {% ifequal user.username creatorprofile.user.username %}
+                <button class="btn btn-warning"><a href="{% url 'creatorprofile_edit' %}">update profile</a></button>
+            {% endifequal %}
+          <p class="text-secondary">{{ creatorprofile.user.email }}</p>
+          <p class="text-primary">city - {{ creatorprofile.city }}</p>
+        <p class="text-primary">state - {{ creatorprofile.state }}</p>
+        <p class="text-primary">qualification -{{ creatorprofile.edu }}</p>
+        <p class="text-primary">rating -{{ creatorprofile.rating }}</p>
+
+        </div>
+      </div>
+    </div>
+
+        <h2>Courses Published :</h2>
+        {% for course in coursepublished %}
+        <div>
+             <div class="article-metadata">
+                    <a class="mr-2" href="{% url 'creatorprofilenu' course.owner.pk %}">{{ course.owner }}</a>
+                  <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>     |  Rating - {{ course.rating }}
+                </div>
+                <h3><a class="article-title" href=#>{{ course.subject }}</a></h3>
+                <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
+                <p class="article-content">{{ course.overview }}</p>
+        </div>
+        {% endfor %}
+
+{% endblock content %}

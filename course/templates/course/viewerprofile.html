@@ -1,0 +1,65 @@
+{% extends "user/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="content-section">
+      <div class="media">
+        <img class="rounded-circle account-img" src="{{ viewerprofile.image.url }}">
+        <div class="media-body">
+          <h2 class="account-heading">{{ viewerprofile.user.username }}</h2>
+            {% ifequal user.username viewerprofile.user.username %}
+                <button class="btn btn-warning"><a href="{% url 'viewerprofile_edit' %}">update profile</a></button>
+            {% endifequal %}
+          <p class="text-secondary">{{ viewerprofile.user.email }}</p>
+           <p class="text-primary">city - {{ viewerprofile.city }}</p>
+        <p class="text-primary">state - {{ viewerprofile.state }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+          <div class="content-section">
+            <h3>creator following</h3>
+            <p class='text-muted'>Following
+              <ul class="list-group">
+              {% for user in viewerprofile.following.all %}
+                  <a href='{% url 'profilecreator' user.username %}'>
+                  <li class="list-group-item list-group-item-light">{{ user.username }}</li>
+                  </a>
+              {% endfor %}
+              </ul>
+            </p>
+          </div>
+    </div>
+            {% ifequal user viewerprofile.user %}
+                <h2>Courses completed :</h2>
+                {% for course in coursecompleted %}
+                <div>
+                     <div class="article-metadata">
+                            <a class="mr-2" href="{% url 'profilecreator' course.owner.username %}">{{ course.owner }}</a>
+                          <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>     |  Rating - {{ course.rating }}
+                        </div>
+                        <h3><a class="article-title" href=#>{{ course.subject }}</a></h3>
+                        <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
+                        <p class="article-content">{{ course.overview }}</p>
+                     </div>
+                </div>
+                {% endfor %}<br>
+
+
+                 <h2>Courses ongoing :</h2>
+                {% for course in ongoing %}
+                <div>
+                     <div class="article-metadata">
+                            <a class="mr-2" href="{% url 'profilecreator' course.owner.username %}">{{ course.owner }}</a>
+                          <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>     |  Rating - {{ course.rating }}
+                        </div>
+                        <h3><a class="article-title" href=#>{{ course.subject }}</a></h3>
+                        <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
+                        <p class="article-content">{{ course.overview }}</p>
+                     </div>
+                </div>
+                {% endfor %}<br>
+
+            {% endifequal %}
+
+
+{% endblock content %}

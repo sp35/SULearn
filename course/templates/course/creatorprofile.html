@@ -1,0 +1,131 @@
+{% extends "user/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="content-section">
+      <div class="media">
+        <img class="rounded-circle account-img" src="{{ creatorprofile.image.url }}">
+          {%ifnotequal creatorprofile.user.username  user.username%}
+                {% if user.vprofile %}
+                    {%if  creatorprofile.user  in user.vprofile.following.all %}
+                        <form action='{% url 'creator_following' creatorprofile.user.pk%}' method='POST'>
+                            {%csrf_token%}
+                            <input type='hidden' name='profile_pk' value={{creatorprofile.user.pk}}>
+
+                            <button type='submit'  class="btn btn-danger">Unfollow</buttton>
+                        </form>
+                    {%else%}
+                        <form action='{% url 'creator_following' creatorprofile.user.pk %}' method='POST'>
+                            {%csrf_token%}
+
+                            <input type='hidden' name='profile_pk' value={{creatorprofile.user.pk}}>
+                            <button  type="submit" class="btn btn-primary">Follow</buttton>
+                        </form>
+                    {%endif%}
+                {% elif user.cprofile %}
+                    {%if  creatorprofile.user  in user.cprofile.following.all %}
+                        <form action='{% url 'creator_following' creatorprofile.user.pk %}' method='POST'>
+                            {%csrf_token%}
+                            <input type='hidden' name='profile_pk' value={{creatorprofile.user.pk}}>
+
+                            <button type='submit'  class="btn btn-danger">Unfollow</buttton>
+                        </form>
+                    {%else%}
+                        <form action='{% url 'creator_following' creatorprofile.user.pk%}' method='POST'>
+                            {%csrf_token%}
+
+                            <input type='hidden' name='profile_pk' value={{creatorprofile.user.pk}}>
+                            <button id='follow-btn' type="submit" class="btn btn-primary">Follow</buttton>
+                        </form>
+                    {%endif%}
+                {%endif%}
+
+          {%else%}
+          {%endifnotequal%}
+      </div>
+        <div class="media-body">
+          <h2 class="account-heading">{{ creatorprofile.user.username }}</h2>
+            {% ifequal user.username creatorprofile.user.username %}
+                <button class="btn btn-warning"><a href="{% url 'creatorprofile_edit' %}">update profile</a></button>
+            {% endifequal %}
+          <p class="text-secondary">{{ creatorprofile.user.email }}</p>
+          <p class="text-primary">city - {{ creatorprofile.city }}</p>
+        <p class="text-primary">state - {{ creatorprofile.state }}</p>
+        <p class="text-primary">qualification -{{ creatorprofile.edu }}</p>
+        <p class="text-primary">rating -{{ creatorprofile.rating }}</p>
+
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+          <div class="content-section">
+            <h3>creator following</h3>
+            <p class='text-muted'>Following
+              <ul class="list-group">
+              {% for user in creatorprofile.following.all %}
+                  <a href='{% url 'profilecreator' user.username %}'>
+                  <li class="list-group-item list-group-item-light">{{ user.username }}</li>
+                  </a>
+              {% endfor %}
+              </ul>
+            </p>
+          </div>
+    </div>
+
+    {% ifequal user creatorprofile.user %}
+        <h2>Courses completed :</h2>
+        {% for course in coursecompleted %}
+        </div>
+             <div class="article-metadata">
+                    <a class="mr-2" href="{% url 'profilecreator' course.owner.username %}">{{ course.owner }}</a>
+                  <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>     |  Rating - {{ course.rating }}
+                </div>
+                <h3><a class="article-title" href=#>{{ course.subject }}</a></h3>
+                <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
+                <p class="article-content">{{ course.overview }}</p>
+        </div>
+        {% endfor %}<br>
+
+
+         <h2>Courses ongoing :</h2>
+        {% for course in ongoing %}
+        </div>
+             <div class="article-metadata">
+                    <a class="mr-2" href="{% url 'profilecreator' course.owner.username %}">{{ course.owner }}</a>
+                  <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>     |  Rating - {{ course.rating }}
+                </div>
+                <h3><a class="article-title" href=#>{{ course.subject }}</a></h3>
+                <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
+                <p class="article-content">{{ course.overview }}</p>
+        </div>
+        {% endfor %}<br>
+
+        <h2>Courses Published :</h2>
+        {% for course in coursepublished %}
+        </div>
+             <div class="article-metadata">
+                    <a class="mr-2" href="{% url 'profilecreator' course.owner.username %}">{{ course.owner }}</a>
+                  <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>     |  Rating - {{ course.rating }}
+                </div>
+                <h3><a class="article-title" href=#>{{ course.subject }}</a></h3>
+                <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
+                <p class="article-content">{{ course.overview }}</p>
+        </div>
+        {% endfor %}
+
+    {% else %}
+        <h2>Courses Published :</h2>
+        {% for course in coursepublished %}
+        </div>
+             <div class="article-metadata">
+                    <a class="mr-2" href="{% url 'profilecreator' course.owner.username %}">{{ course.owner }}</a>
+                  <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>     |  Rating - {{ course.rating }}
+                </div>
+                <h3><a class="article-title" href=#>{{ course.subject }}</a></h3>
+                <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
+                <p class="article-content">{{ course.overview }}</p>
+        </div>
+        {% endfor %}
+    {% endifequal %}
+
+
+{% endblock content %}

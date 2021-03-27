@@ -1,0 +1,44 @@
+{% extends "user/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+      <article class="media content-section">
+          <img class="rounded-circle article-img" src="{{ course.owner.cprofile.image.url }}">
+          <div class="media-body">
+            <div class="article-metadata">
+              <a class="mr-2" href='{% url 'profilecreator' course.owner.username %}'>{{ course.owner }}</a>
+
+              <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>     |  Rating - {{ course.rating }}
+            </div>
+            <h3><a class="article-title" href=#>{{ course.subject }}</a></h3>
+            <h2><a class="article-title" href={% url 'coursenu' course.pk %}>{{ course.title }}</a></h2>
+
+            <p class="article-content">{{ course.overview }}</p>
+          </div>
+        {% if user == course.owner %}
+        <button class="btn btn-danger"><a href='{% url 'add-module' course.pk %}'>Add module</a></button>
+        {% endif %}
+        </article>
+        Login to Enroll
+        {% for module in module %}
+            <article class="media content-section">
+              <div class="media-body">
+                  {% if user.is_authenticated %}
+                    <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ module.title }}</a></h2>
+                  {%else%}
+                    <h2><a class="article-title" href={% url 'coursenu' course.pk %}>{{ module.title }}</a></h2>
+                  {% endif %}
+                <p class="article-content">{{ module.description }}</p>
+              </div>
+            </article>
+        {% endfor %}
+    <h2>Reviews</h2>
+    {% for review in review %}
+        <article class="media content-section">
+              <div class="media-body">
+                <h2>{{ review.user }}</h2>
+                <p class="article-content">{{ review.review }}</p>
+              </div>
+            </article>
+    {% endfor %}
+
+{% endblock content %}
