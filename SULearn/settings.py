@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'gnsjc$g_3gd_x2psi9cxnf&@13sk0&bwwdd6q@-kt@ig271$m2'
+SECRET_KEY = 'xxx$xx&@13sk0&xxxx@-kt@xxxx$m2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -150,8 +150,8 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 LOGIN_REDIRECT_URL='home'
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY='721871775936-d21dhia79i8a761r04jm01vmg91ghndj.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET='nuEVlxvawsun7UXigtBZFQuy'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY='721871775936-xx.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET='xx'
 ACCOUNT_SIGNUP_REDIRECT_URL = "/viewerform/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = '/'
@@ -162,5 +162,5 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'akshat8810@gmail.com'
-EMAIL_HOST_PASSWORD = 'hsjswxfyibhvkvcm'
+EMAIL_HOST_PASSWORD = 'xx'
 EMAIL_USE_SSL = False

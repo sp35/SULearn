@@ -1,131 +1,260 @@
+
+
+
+
+
 {% extends "user/base.html" %}
-{% load crispy_forms_tags %}
 {% block content %}
-    <div class="content-section">
-      <div class="media">
-        <img class="rounded-circle account-img" src="{{ creatorprofile.image.url }}">
-          {%ifnotequal creatorprofile.user.username  user.username%}
-                {% if user.vprofile %}
-                    {%if  creatorprofile.user  in user.vprofile.following.all %}
-                        <form action='{% url 'creator_following' creatorprofile.user.pk%}' method='POST'>
-                            {%csrf_token%}
-                            <input type='hidden' name='profile_pk' value={{creatorprofile.user.pk}}>
+    <div class="grid-container">
+        <div class="body">
+            <div class="rightbody">
 
-                            <button type='submit'  class="btn btn-danger">Unfollow</buttton>
-                        </form>
-                    {%else%}
-                        <form action='{% url 'creator_following' creatorprofile.user.pk %}' method='POST'>
-                            {%csrf_token%}
+                <div class="top">
+                    <h3>Profile</h3>
 
-                            <input type='hidden' name='profile_pk' value={{creatorprofile.user.pk}}>
-                            <button  type="submit" class="btn btn-primary">Follow</buttton>
-                        </form>
-                    {%endif%}
-                {% elif user.cprofile %}
-                    {%if  creatorprofile.user  in user.cprofile.following.all %}
-                        <form action='{% url 'creator_following' creatorprofile.user.pk %}' method='POST'>
-                            {%csrf_token%}
-                            <input type='hidden' name='profile_pk' value={{creatorprofile.user.pk}}>
+                           <article class="media content-section">
+                        <img class="rounded-circle account-img" src="{{ creatorprofile.image.url }}">
+                        <div class="media-body">
+                          <h2 class="account-heading">{{ creatorprofile.user.username }}</h2>
+                            {% ifequal user.username creatorprofile.user.username %}
+                                <button class="btn btn-warning"><a href="{% url 'creatorprofile_edit' %}">update profile</a></button>
+                            {% endifequal %}
+                          <p class="text-secondary">{{ creatorprofile.user.email }}</p>
+                            <div>
+                            {%ifnotequal creatorprofile.user.username  user.username%}
+                                {% if user.vprofile %}
+                                    {% if  creatorprofile.user  in user.vprofile.following.all %}
+                                        <form action='{% url 'creator_following' creatorprofile.user.pk%}' method='POST'>
+                                            {%csrf_token%}
+                                            <input type='hidden' name='profile_pk' value={{creatorprofile.user.pk}}>
 
-                            <button type='submit'  class="btn btn-danger">Unfollow</buttton>
-                        </form>
-                    {%else%}
-                        <form action='{% url 'creator_following' creatorprofile.user.pk%}' method='POST'>
-                            {%csrf_token%}
+                                            <button type='submit'  class="btn btn-danger">Unfollow</buttton>
+                                        </form>
+                                    {%else%}
+                                        <form action='{% url 'creator_following' creatorprofile.user.pk %}' method='POST'>
+                                            {%csrf_token%}
 
-                            <input type='hidden' name='profile_pk' value={{creatorprofile.user.pk}}>
-                            <button id='follow-btn' type="submit" class="btn btn-primary">Follow</buttton>
-                        </form>
-                    {%endif%}
-                {%endif%}
+                                            <input type='hidden' name='profile_pk' value={{creatorprofile.user.pk}}>
+                                            <button  type="submit" class="btn btn-primary">Follow</buttton>
+                                        </form>
+                                    {%endif%}
+                                {% endif %}
+                                {% if user.cprofile %}
+                                    {%if  creatorprofile.user  in user.cprofile.following.all %}
+                                        <form action='{% url 'creator_following' creatorprofile.user.pk %}' method='POST'>
+                                            {%csrf_token%}
+                                            <input type='hidden' name='profile_pk' value={{creatorprofile.user.pk}}>
 
-          {%else%}
-          {%endifnotequal%}
-      </div>
-        <div class="media-body">
-          <h2 class="account-heading">{{ creatorprofile.user.username }}</h2>
-            {% ifequal user.username creatorprofile.user.username %}
-                <button class="btn btn-warning"><a href="{% url 'creatorprofile_edit' %}">update profile</a></button>
-            {% endifequal %}
-          <p class="text-secondary">{{ creatorprofile.user.email }}</p>
-          <p class="text-primary">city - {{ creatorprofile.city }}</p>
-        <p class="text-primary">state - {{ creatorprofile.state }}</p>
-        <p class="text-primary">qualification -{{ creatorprofile.edu }}</p>
-        <p class="text-primary">rating -{{ creatorprofile.rating }}</p>
+                                            <button type='submit'  class="btn btn-danger">Unfollow</buttton>
+                                        </form>
+                                    {%else%}
+                                        <form action='{% url 'creator_following' creatorprofile.user.pk%}' method='POST'>
+                                            {%csrf_token%}
+
+                                            <input type='hidden' name='profile_pk' value={{creatorprofile.user.pk}}>
+                                            <button type="submit" class="btn btn-primary">Follow</buttton>
+                                        </form>
+                                    {%endif%}
+                                {% endif %}
+                            {% endifnotequal %}</div>
+                        <p class="text-primary">city - {{ creatorprofile.city }}</p>
+                        <p class="text-primary">state - {{ creatorprofile.state }}</p>
+                        <p class="text-primary">Qualification - {{ creatorprofile.edu }}</p>
+                        <p class="text-secondary">creator-rating : {{ creatorprofile.rating }}</p>
+                        </div>
+                      </article>
+                          </div>
+                    <div class="bottom">
+                    {% ifnotequal user creatorprofile.user %}
+                        <h3>Creators {{ creatorprofile.user }} follow</h3>
+                    {% else %}
+                        <h3>Creators you follow</h3>
+                    {% endifnotequal %}
+
+                        <div class="content-section">
+
+                                <p class='text-muted'>
+                                  <ul class="list-group">
+                                        {% for us in creatorprofile.following.all %}
+                                            <a href='{% url 'profilecreator' us.username %}'>
+                                                <li class="list-group-item list-group-item-light">{{ us.username }}</li><br></a>
+                                        {% endfor %}
+
+                                  </ul>
+                                </p>
+                        </div>
+                    </div>
+            </div>
+            <div class="center">
+                <h2>Courses Published</h2>
+                    {% for course in page_obj1 %}
+                        <article class="media content-section">
+                          <img class="rounded-circle article-img" src="{{ course.owner.cprofile.image.url }}">
+                          <div class="media-body">
+                            <div class="article-metadata">
+                                {% if user.is_authenticated %}
+                                    <a class="mr-2" href="{% url 'profilecreator' course.owner.username %}">{{ course.owner }}</a>
+                                {% else %}
+                                    <a class="mr-2" href="{% url 'creatorprofilenu' course.owner.pk %}">{{ course.owner }}</a>
+                                {% endif %}
+                                <p class="text-primary">creator rating -{{ course.owner.cprofile.rating }}</p>
+                              <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>
+                            </div>
+                            <h3><a class="article-title" href='{% url 'subjectlist' course.subject.pk %}'>{{ course.subject }}</a></h3>
+                            <p class="text-primary">course rating -{{ course.rating }}</p>
+                              {% if user.is_authenticated %}
+                                <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
+                              {% else %}
+                                  <h2><a class="article-title" href={% url 'coursenu' course.pk %}>{{ course.title }}</a></h2>
+                              {% endif %}
+                            <p class="article-content">{{ course.overview }}</p>
+                          </div>
+                        </article>
+                    {% endfor %}
+                    <div class="pagination">
+                        <span class="step-links">
+                            {% if page_obj1.has_previous %}
+                                <button class="btn btn-danger">
+                                <a href="?page1=1&page2={{request.GET.page2}}&page3={{request.GET.page3}}">&laquo; first</a></button>
+                                <button class="btn btn-danger">
+                                <a href="?page1={{ page_obj1.previous_page_number }}&page2={{request.GET.page2}}&page3={{request.GET.page3}}">previous</a></button>
+                            {% endif %}
+
+                            <span class="current">
+                                Page {{ page_obj1.number }} of {{ page_obj1.paginator.num_pages }}.
+                            </span>
+
+                            {% if page_obj1.has_next %}
+                                <button class="btn btn-danger">
+                                    <a href="?page1={{ page_obj1.next_page_number }}&page2={{request.GET.page2}}&page3={{request.GET.page3}}">next</a></button>
+                                <button class="btn btn-danger">
+                                    <a href="?page1={{ page_obj1.paginator.num_pages }}&page3={{request.GET.page3}}">last &raquo;</a></button>
+                            {% endif %}
+                        </span>
+                    </div>
+            </div>
+
+
+            <div class="right">
+                <div class="tr">
+                    {% ifequal user creatorprofile.user %}
+                        <h2>Courses ongoing</h2>
+                        {% if ongoing %}
+                            {% for course in page_obj2 %}
+                                <article class="media content-section">
+                                  <img class="rounded-circle article-img" src="{{ course.owner.cprofile.image.url }}">
+                                  <div class="media-body">
+                                    <div class="article-metadata">
+                                        {% if user.is_authenticated %}
+                                            <a class="mr-2" href="{% url 'profilecreator' course.owner.username %}">{{ course.owner }}</a>
+                                        {% else %}
+                                            <a class="mr-2" href="{% url 'creatorprofilenu' course.owner.pk %}">{{ course.owner }}</a>
+                                        {% endif %}
+                                        <p class="text-primary">creator rating -{{ course.owner.cprofile.rating }}</p>
+                                      <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>
+                                    </div>
+                                    <h3><a class="article-title" href='{% url 'subjectlist' course.subject.pk %}'>{{ course.subject }}</a></h3>
+                                    <p class="text-primary">course rating -{{ course.rating }}</p>
+                                      {% if user.is_authenticated %}
+                                        <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
+                                      {% else %}
+                                          <h2><a class="article-title" href={% url 'coursenu' course.pk %}>{{ course.title }}</a></h2>
+                                      {% endif %}
+                                    <p class="article-content">{{ course.overview }}</p>
+                                  </div>
+                                </article>
+                            {% endfor %}
+                            <div class="pagination">
+                                <span class="step-links">
+                                    {% if page_obj2.has_previous %}
+                                        <button class="btn btn-danger">
+                                        <a href="?page2=1&page1={{request.GET.page2}}&page3={{request.GET.page3}}">&laquo; first</a></button>
+                                        <button class="btn btn-danger">
+                                        <a href="?page2={{ page_obj2.previous_page_number }}&page1={{request.GET.page1}}&page3={{request.GET.page3}}">previous</a></button>
+                                    {% endif %}
+
+                                    <span class="current">
+                                        Page {{ page_obj2.number }} of {{ page_obj2.paginator.num_pages }}.
+                                    </span>
+
+                                    {% if page_obj2.has_next %}
+                                        <button class="btn btn-danger">
+                                            <a href="?page2={{ page_obj2.next_page_number }}&page1={{request.GET.page1}}&page3={{request.GET.page3}}">next</a></button>
+                                        <button class="btn btn-danger">
+                                            <a href="?page2={{ page_obj2.paginator.num_pages }}&page1={{request.GET.page1}}&page3={{request.GET.page3}}">last &raquo;</a></button>
+                                    {% endif %}
+                                </span>
+                            </div>
+
+
+                        {% else %}
+                            NO ongoing courses
+                        {% endif %}
+                    {% endifequal %}
+                </div>
+
+
+
+                <div class="br">
+
+                    {% ifequal user creatorprofile.user %}
+                        <h2>Courses Completed</h2>
+                         {% if coursecompleted %}
+                            {% for course in page_obj3 %}
+                                <article class="media content-section">
+                                  <img class="rounded-circle article-img" src="{{ course.owner.cprofile.image.url }}">
+                                  <div class="media-body">
+                                    <div class="article-metadata">
+                                        {% if user.is_authenticated %}
+                                            <a class="mr-2" href="{% url 'profilecreator' course.owner.username %}">{{ course.owner }}</a>
+                                        {% else %}
+                                            <a class="mr-2" href="{% url 'creatorprofilenu' course.owner.pk %}">{{ course.owner }}</a>
+                                        {% endif %}
+                                        <p class="text-primary">creator rating -{{ course.owner.cprofile.rating }}</p>
+                                      <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>
+                                    </div>
+                                    <h3><a class="article-title" href='{% url 'subjectlist' course.subject.pk %}'>{{ course.subject }}</a></h3>
+                                    <p class="text-primary">course rating -{{ course.rating }}</p>
+                                      {% if user.is_authenticated %}
+                                        <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
+                                      {% else %}
+                                          <h2><a class="article-title" href={% url 'coursenu' course.pk %}>{{ course.title }}</a></h2>
+                                      {% endif %}
+                                    <p class="article-content">{{ course.overview }}</p>
+                                  </div>
+                                </article>
+                            {% endfor %}
+                             <div class="pagination">
+                                <span class="step-links">
+                                    {% if page_obj3.has_previous %}
+                                        <button class="btn btn-danger">
+                                        <a href="?page3=1&page2={{request.GET.page2}}&page1={{request.GET.page1}}">&laquo; first</a></button>
+                                        <button class="btn btn-danger">
+                                        <a href="?page3={{ page_obj3.previous_page_number }}&page2={{request.GET.page2}}&page1={{request.GET.page1}}">previous</a></button>
+                                    {% endif %}
+
+                                    <span class="current">
+                                        Page {{ page_obj3.number }} of {{ page_obj3.paginator.num_pages }}.
+                                    </span>
+
+                                    {% if page_obj3.has_next %}
+                                        <button class="btn btn-danger">
+                                            <a href="?page3={{ page_obj3.next_page_number }}&page2={{request.GET.page2}}&page1={{request.GET.page1}}">next</a></button>
+                                        <button class="btn btn-danger">
+                                            <a href="?page3={{ page_obj3.paginator.num_pages }}&page2={{request.GET.page2}}&page1={{request.GET.page1}}">last &raquo;</a></button>
+                                    {% endif %}
+                                </span>
+                            </div>
+
+                        {% else %}
+                            NO completed courses
+                        {% endif %}
+                    {% endifequal %}
+                </div>
+            </div>
+
+
 
         </div>
-      </div>
     </div>
-    <div class="col-md-4">
-          <div class="content-section">
-            <h3>creator following</h3>
-            <p class='text-muted'>Following
-              <ul class="list-group">
-              {% for user in creatorprofile.following.all %}
-                  <a href='{% url 'profilecreator' user.username %}'>
-                  <li class="list-group-item list-group-item-light">{{ user.username }}</li>
-                  </a>
-              {% endfor %}
-              </ul>
-            </p>
-          </div>
-    </div>
-
-    {% ifequal user creatorprofile.user %}
-        <h2>Courses completed :</h2>
-        {% for course in coursecompleted %}
-        </div>
-             <div class="article-metadata">
-                    <a class="mr-2" href="{% url 'profilecreator' course.owner.username %}">{{ course.owner }}</a>
-                  <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>     |  Rating - {{ course.rating }}
-                </div>
-                <h3><a class="article-title" href=#>{{ course.subject }}</a></h3>
-                <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
-                <p class="article-content">{{ course.overview }}</p>
-        </div>
-        {% endfor %}<br>
-
-
-         <h2>Courses ongoing :</h2>
-        {% for course in ongoing %}
-        </div>
-             <div class="article-metadata">
-                    <a class="mr-2" href="{% url 'profilecreator' course.owner.username %}">{{ course.owner }}</a>
-                  <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>     |  Rating - {{ course.rating }}
-                </div>
-                <h3><a class="article-title" href=#>{{ course.subject }}</a></h3>
-                <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
-                <p class="article-content">{{ course.overview }}</p>
-        </div>
-        {% endfor %}<br>
-
-        <h2>Courses Published :</h2>
-        {% for course in coursepublished %}
-        </div>
-             <div class="article-metadata">
-                    <a class="mr-2" href="{% url 'profilecreator' course.owner.username %}">{{ course.owner }}</a>
-                  <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>     |  Rating - {{ course.rating }}
-                </div>
-                <h3><a class="article-title" href=#>{{ course.subject }}</a></h3>
-                <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
-                <p class="article-content">{{ course.overview }}</p>
-        </div>
-        {% endfor %}
-
-    {% else %}
-        <h2>Courses Published :</h2>
-        {% for course in coursepublished %}
-        </div>
-             <div class="article-metadata">
-                    <a class="mr-2" href="{% url 'profilecreator' course.owner.username %}">{{ course.owner }}</a>
-                  <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>     |  Rating - {{ course.rating }}
-                </div>
-                <h3><a class="article-title" href=#>{{ course.subject }}</a></h3>
-                <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
-                <p class="article-content">{{ course.overview }}</p>
-        </div>
-        {% endfor %}
-    {% endifequal %}
-
-
 {% endblock content %}

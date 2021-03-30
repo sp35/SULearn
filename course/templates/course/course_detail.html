@@ -1,69 +1,188 @@
+
 {% extends "user/base.html" %}
-{% load crispy_forms_tags %}
 {% block content %}
-      <article class="media content-section">
-          <img class="rounded-circle article-img" src="{{ course.owner.cprofile.image.url }}">
-          <div class="media-body">
-            <div class="article-metadata">
-                <a class="mr-2" href="{% url 'profilecreator' course.owner.username %}">{{ course.owner }}</a>
-              <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>     | course Rating - {{ course.rating }}
+    <div class="grid-container">
+        <div class="body">
+            <div class="rightbody">
+                {% if user.is_authenticated %}
+
+                    <div class="top">
+                    <h3>Creator Following</h3>
+
+                        <div class="content-section">
+
+                                <p class='text-muted'>
+                                  <ul class="list-group">
+                                  {% if user.cprofile %}
+                                        {% for us in user.cprofile.following.all %}
+                                            <a href='{% url 'profilecreator' us.username %}'>
+                                                <li class="list-group-item list-group-item-light">{{ us.username }}</li><br></a>
+                                        {% endfor %}
+                                  {% endif %}
+                                  {% if user.vprofile %}
+                                        {% for us in user.vprofile.following.all %}
+                                            <a href='{% url 'profilecreator' us.username %}'>
+                                                <li class="list-group-item list-group-item-light">{{ us.username }}</li><br></a>
+                                        {% endfor %}
+                                  {% endif %}
+                                  </ul>
+                                </p>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
-            <h3><a class="article-title" href=#>{{ course.subject }}</a></h3>
-            <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
-            <p class="article-content">{{ course.overview }}</p>
-          </div>
-        {% if user == course.owner %}
-        <button class="btn btn-danger"><a href='{% url 'add-module' course.pk %}'>Add module</a></button>
-        {% endif %}
-        </article>
-        {% if joined %}
-            You are enrolled in this course
-            <h2>Modules</h2>
-        {% else %}
-            <form action ='{%url 'enroll' course.pk %}' method='POST'>
-                {%csrf_token%}
-                <button type='submit', name="course_id", value = {{course.pk}} , class="btn btn-warning" > Enroll </button>
-            </form>
-        {% endif %}
-        {% for module in modcomp %}
-            <article class="media content-section">
-              <div class="media-body">
-                <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ module.title }}</a></h2>
-                <p class="article-content">{{ module.description }}</p>
-              </div>
-                {% if joined %}
-                    <button class="btn btn-secondary"><a href='{% url 'complete' module.pk %}'>completed</a></button>
-                {% endif %}
-            </article>
-        {% endfor %}
-        {% for module in modincomp %}
-            <article class="media content-section">
-              <div class="media-body">
-                <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ module.title }}</a></h2>
-                <p class="article-content">{{ module.description }}</p>
-              </div>
-                {% if joined %}
-                    <button class="btn btn-danger"><a href='{% url 'complete' module.pk %}'>complete</a></button>
-                {% endif %}
-            </article>
-        {% endfor %}
+
+            <div class="center">
+            <h2>Course Details</h2>
+                        <article class="media content-section">
+                          <img class="rounded-circle article-img" src="{{ course.owner.cprofile.image.url }}">
+                          <div class="media-body">
+                            <div class="article-metadata">
+                                {% if user.is_authenticated %}
+                                    <a class="mr-2" href="{% url 'profilecreator' course.owner.username %}">{{ course.owner }}</a>
+                                {% else %}
+                                    <a class="mr-2" href="{% url 'creatorprofilenu' course.owner.pk %}">{{ course.owner }}</a>
+                                {% endif %}
+                                <p class="text-primary">creator rating -{{ course.owner.cprofile.rating }}</p>
+                              <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>
+                            </div>
+                            <h3><a class="article-title" href='{% url 'subjectlist' course.subject.pk %}'>{{ course.subject }}</a></h3>
+                            <p class="text-primary">course rating -{{ course.rating }}</p>
+                              {% if user.is_authenticated %}
+                                <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
+                              {% else %}
+                                  <h2><a class="article-title" href={% url 'coursenu' course.pk %}>{{ course.title }}</a></h2>
+                              {% endif %}
+                            <p class="article-content">{{ course.overview }}</p>
+                          </div>
+                        </article>
+                        {% if user == course.owner %}
+                            <button class="btn btn-danger"><a href='{% url 'add-module' course.pk %}'>Add module</a></button>
+                        {% endif %}
+                        <h2>Modules</h2>
+                            {% ifnotequal user course.owner %}
+                                {% if joined %}
+                                    You are enrolled in this course
+
+                                {% else %}
+                                    <form action ='{%url 'enroll' course.pk %}' method='POST'>
+                                        {%csrf_token%}
+                                        <button type='submit', name="course_id", value = {{course.pk}} , class="btn btn-warning" > Enroll </button>
+                                    </form>
+                                {% endif %}
+                                {}
+                            {% endifnotequal %}
+                        {% ifequal user course.owner %}
+                            {% for module in modcomp %}
+                                <article class="media content-section">
+                                  <div class="media-body">
+                                    <h2><a class="article-title" href={% url 'moduledetail' module.pk %}>{{ module.title }}</a></h2>
+                                    <p class="article-content">{{ module.description }}</p>
+                                  </div>
+                                    {% ifnotequal user course.owner %}
+                                        <button class="btn btn-secondary"><a href='{% url 'complete' module.pk %}'>completed</a></button>
+
+                                    {% endifnotequal %}
+                                </article>
+                            {% endfor %}
+                            {% for module in modincomp %}
+                                <article class="media content-section">
+                                  <div class="media-body">
+                                        <h2><a class="article-title" href={% url 'moduledetail' module.pk %}>{{ module.title }}</a></h2>
+                                        {{ module.title }}
+                                  </div>
+                                    {% ifnotequal user course.owner %}
+                                    {% if joined %}
+                                        <button class="btn btn-danger"><a href='{% url 'complete' module.pk %}'>complete</a></button>
+                                    {% endif %}
+                                    {% endifnotequal %}
+                                </article>
+                            {% endfor %}
+
+                        {% else %}
+                            {% if joined %}
+                                {% for module in modcomp %}
+                                    <article class="media content-section">
+                                      <div class="media-body">
+                                        <h2><a class="article-title" href={% url 'moduledetail' module.pk %}>{{ module.title }}</a></h2>
+                                        <p class="article-content">{{ module.description }}</p>
+                                      </div>
+                                        {% ifnotequal user course.owner %}
+                                            <button class="btn btn-secondary"><a href='{% url 'complete' module.pk %}'>completed</a></button>
+
+                                        {% endifnotequal %}
+                                    </article>
+                                {% endfor %}
+                                {% for module in modincomp %}
+                                    <article class="media content-section">
+                                      <div class="media-body">
+                                            <h2><a class="article-title" href={% url 'moduledetail' module.pk %}>{{ module.title }}</a></h2>
+                                            {{ module.title }}
+                                      </div>
+                                        {% ifnotequal user course.owner %}
+                                        {% if joined %}
+                                            <button class="btn btn-danger"><a href='{% url 'complete' module.pk %}'>complete</a></button>
+                                        {% endif %}
+                                        {% endifnotequal %}
+                                    </article>
+                                {% endfor %}
+                            {% else %}
+                                {% if module %}
+                                    <h2>Enroll in course to view Module content</h2>
+                                {% endif %}
+                            {% endif %}
+
+                        {% endifequal %}
+                        {% if module %}
+                            {% if coursecomp %}
+                                congratulation! you have completed the course
+                                <button class="btn btn-warning"><a href='{% url 'course-rate' course.pk %}'>Rate the course and add review</a></button>
+                            {% endif %}
+                        {% else %}
+                            <h2>no module present</h2>
+                        {% endif %}
 
 
-    {% if module %}
-        {% if coursecomp %}
-            congratulation! you have completed the course
-            <button class="btn btn-warning"><a href='{% url 'course-rate' course.pk %}'>Rate the course and add review</a></button>
-        {% endif %}
-    {% endif %}
-    <h2>Reviews</h2>
+            </div>
 
-    {% for review in review %}
-        <article class="media content-section">
-              <div class="media-body">
-                <h2>{{ review.user }}</h2>
-                <p class="article-content">{{ review.review }}</p>
-              </div>
-            </article>
-    {% endfor %}
+            <div class="right">
+                <h2>Course Reviews</h2>
+                {% for review in page_obj %}
+                        <article class="media content-section">
+                              <div class="media-body">
+                                <h2>{{ review.user }}</h2> <small class="text-muted">Rated : {{ review.rate }}</small>
+                                <p class="article-content">{{ review.review }}</p>
+                              </div>
+                            </article>
+                    {% endfor %}
+                <div class="pagination">
+                        <span class="step-links">
+                            {% if page_obj.has_previous %}
+                                <button class="btn btn-danger">
+                                <a href="?page=1">&laquo; first</a></button>
+                                <button class="btn btn-danger">
+                                <a href="?page={{ page_obj.previous_page_number }}">previous</a></button>
+                            {% endif %}
 
+                            <span class="current">
+                                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                            </span>
+
+                            {% if page_obj.has_next %}
+                                <button class="btn btn-danger">
+                                    <a href="?page={{ page_obj.next_page_number }}">next</a></button>
+                                <button class="btn btn-danger">
+                                    <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a></button>
+                            {% endif %}
+                        </span>
+                    </div>
+
+
+            </div>
+
+
+
+        </div>
+    </div>
 {% endblock content %}
+

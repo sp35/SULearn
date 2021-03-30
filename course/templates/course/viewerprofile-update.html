@@ -22,7 +22,7 @@
     {% endif %}
 </head>
 <body>
-
+   <div class="grid-container">
     <main role="main" class="container">
       <div class="row">
         <div class="col-md-8">
@@ -35,10 +35,10 @@
           {% endif %}
 
             <div class="content-section">
-                <form method="POST">
+                <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     <fieldset class="form-group">
-                        <legend class="border-bottom mb-4">Edit Post</legend>
+                        <legend class="border-bottom mb-4">Update Profile</legend>
                         {{ u_form|crispy }}
                         {{ p_form|crispy }}
                     </fieldset>
@@ -54,6 +54,7 @@
         </div>
       </div>
     </main>
+   </div>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

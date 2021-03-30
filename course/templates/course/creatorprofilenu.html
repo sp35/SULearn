@@ -1,36 +1,98 @@
+
+
+
+
+
+
+
+
 {% extends "user/base.html" %}
-{% load crispy_forms_tags %}
 {% block content %}
-    <div class="content-section">
-      <div class="media">
-        <img class="rounded-circle account-img" src="{{ creatorprofile.image.url }}">
-      </div>
-        <div class="media-body">
-          <h2 class="account-heading">{{ creatorprofile.user.username }}</h2>
-            {% ifequal user.username creatorprofile.user.username %}
-                <button class="btn btn-warning"><a href="{% url 'creatorprofile_edit' %}">update profile</a></button>
+    <div class="grid-container">
+        <div class="body">
+            <div class="rightbody">
+
+                <div class="top">
+                    <h3>Profile</h3>
+
+                           <article class="media content-section">
+                        <img class="rounded-circle account-img" src="{{ creatorprofile.image.url }}">
+                        <div class="media-body">
+                          <h2 class="account-heading">{{ creatorprofile.user.username }}</h2>
+                            {% ifequal user.username creatorprofile.user.username %}
+                                <button class="btn btn-warning"><a href="{% url 'creatorprofile_edit' %}">update profile</a></button>
+                            {% endifequal %}
+                          <p class="text-secondary">{{ creatorprofile.user.email }}</p>
+                           <p class="text-primary">city - {{ creatorprofile.city }}</p>
+                        <p class="text-primary">state - {{ creatorprofile.state }}</p>
+                        <p class="text-primary">Qualification - {{ creatorprofile.edu }}</p>
+                        <p class="text-secondary">creator-rating : {{ creatorprofile.rating }}</p>
+                        </div>
+                      </article>
+                          </div>
+
+            </div>
+            <div class="center">
+                <h2>Courses Published</h2>
+                    {% for course in coursepublished %}
+                        <article class="media content-section">
+                          <img class="rounded-circle article-img" src="{{ course.owner.cprofile.image.url }}">
+                          <div class="media-body">
+                            <div class="article-metadata">
+                                {% if user.is_authenticated %}
+                                    <a class="mr-2" href="{% url 'profilecreator' course.owner.username %}">{{ course.owner }}</a>
+                                {% else %}
+                                    <a class="mr-2" href="{% url 'creatorprofilenu' course.owner.pk %}">{{ course.owner }}</a>
+                                {% endif %}
+                                <p class="text-primary">creator rating -{{ course.owner.cprofile.rating }}</p>
+                              <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>
+                            </div>
+                            <h3><a class="article-title" href='{% url 'subjectlist' course.subject.pk %}'>{{ course.subject }}</a></h3>
+                            <p class="text-primary">course rating -{{ course.rating }}</p>
+                              {% if user.is_authenticated %}
+                                <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
+                              {% else %}
+                                  <h2><a class="article-title" href={% url 'coursenu' course.pk %}>{{ course.title }}</a></h2>
+                              {% endif %}
+                            <p class="article-content">{{ course.overview }}</p>
+                          </div>
+                        </article>
+                    {% endfor %}
+            </div>
+
+
+            <div class="right">
+            {% ifequal user creatorprofile.user %}
+                <h2>Courses ongoing</h2>
+                {% for course in ongoing %}
+                    <article class="media content-section">
+                      <img class="rounded-circle article-img" src="{{ course.owner.cprofile.image.url }}">
+                      <div class="media-body">
+                        <div class="article-metadata">
+                            {% if user.is_authenticated %}
+                                <a class="mr-2" href="{% url 'profilecreator' course.owner.username %}">{{ course.owner }}</a>
+                            {% else %}
+                                <a class="mr-2" href="{% url 'creatorprofilenu' course.owner.pk %}">{{ course.owner }}</a>
+                            {% endif %}
+                            <p class="text-primary">creator rating -{{ course.owner.cprofile.rating }}</p>
+                          <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>
+                        </div>
+                        <h3><a class="article-title" href='{% url 'subjectlist' course.subject.pk %}'>{{ course.subject }}</a></h3>
+                        <p class="text-primary">course rating -{{ course.rating }}</p>
+                          {% if user.is_authenticated %}
+                            <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
+                          {% else %}
+                              <h2><a class="article-title" href={% url 'coursenu' course.pk %}>{{ course.title }}</a></h2>
+                          {% endif %}
+                        <p class="article-content">{{ course.overview }}</p>
+                      </div>
+                    </article>
+                {% endfor %}
             {% endifequal %}
-          <p class="text-secondary">{{ creatorprofile.user.email }}</p>
-          <p class="text-primary">city - {{ creatorprofile.city }}</p>
-        <p class="text-primary">state - {{ creatorprofile.state }}</p>
-        <p class="text-primary">qualification -{{ creatorprofile.edu }}</p>
-        <p class="text-primary">rating -{{ creatorprofile.rating }}</p>
+            </div>
+
+
 
         </div>
-      </div>
     </div>
-
-        <h2>Courses Published :</h2>
-        {% for course in coursepublished %}
-        <div>
-             <div class="article-metadata">
-                    <a class="mr-2" href="{% url 'creatorprofilenu' course.owner.pk %}">{{ course.owner }}</a>
-                  <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>     |  Rating - {{ course.rating }}
-                </div>
-                <h3><a class="article-title" href=#>{{ course.subject }}</a></h3>
-                <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
-                <p class="article-content">{{ course.overview }}</p>
-        </div>
-        {% endfor %}
-
 {% endblock content %}

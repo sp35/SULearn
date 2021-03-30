@@ -14,7 +14,7 @@ class ViewerProfile(models.Model):
     state = models.CharField(verbose_name='State', max_length=100)
     doj = models.DateTimeField(default=timezone.now, verbose_name='Date of Joining')
     dob = models.DateTimeField(default=timezone.now, verbose_name='Date of Birth')
-    following = models.ManyToManyField(User)
+    following = models.ManyToManyField(User,blank=True)
     def __str__(self):
         return f'{self.user.username} ViewerProfile'
     def save(self, *args, **kwargs):

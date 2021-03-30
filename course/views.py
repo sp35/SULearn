@@ -12,6 +12,7 @@ from django.contrib import messages
 from allauth.exceptions import ImmediateHttpResponse
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.db.models import Count
+from django.core.paginator import Paginator
 from .forms import CreatorProfileUpdateForm,ViewerProfileUpdateForm,UserUpdateForm
 
 
@@ -35,7 +36,7 @@ class CourseCreate(LoginRequiredMixin,UserPassesTestMixin,CreateView):
 class AddModule(LoginRequiredMixin,UserPassesTestMixin,CreateView):
     model=Module
     template_name='course/addmodule.html'
-    fields=["title",'description']
+    fields=["title",'description','file']
     def form_valid(self, form):
         print(self.kwargs)
         form.instance.course = Course.objects.get(id=self.kwargs['pk'])
@@ -60,25 +61,27 @@ class CourseDetail(DetailView):
         context = super().get_context_data(**kwargs)
         context['joined']=joined
         context['module']=module
-        context['review']=CourseRating.objects.filter(course_id=self.kwargs['pk'])
+        context['review']=CourseRating.objects.filter(course_id=self.kwargs['pk']).all()
         mcom=Completed.objects.filter(user=self.request.user).filter(course_id=self.kwargs['pk']).all()
         modcomp=[mcom.module for mcom in mcom]
         modincomp=[]
-
         for j in module:
             if j in modcomp:
                 continue
             else:
                 modincomp.append(j)
-        print(modcomp)
-        print(modincomp)
-        print(coursecomp)
-        print(module)
         context['modincomp'] = modincomp
         context['modcomp']=modcomp
         context['coursecomp']=coursecomp
 
+        #pagination
+
+        paginator = Paginator(CourseRating.objects.filter(course_id=self.kwargs['pk']).all(), 2)
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        context['page_obj'] = page_obj
         return context
+
 
 class CourseDetailNU(DetailView):
     model=Course
@@ -87,7 +90,14 @@ class CourseDetailNU(DetailView):
         context = super().get_context_data(**kwargs)
         module = Module.objects.filter(course_id=self.kwargs['pk'])
         context['module'] = module
-        context['review'] = CourseRating.objects.filter(course_id=self.kwargs['pk'])
+        context['review'] = CourseRating.objects.filter(course_id=self.kwargs['pk']).all()
+        context['subject']=Subject.objects.all()
+        # pagination
+
+        paginator = Paginator(CourseRating.objects.filter(course_id=self.kwargs['pk']).all(), 2)
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        context['page_obj'] = page_obj
 
         return context
 
@@ -210,7 +220,7 @@ class ProfileViewerDetail(DetailView):
         return get_object_or_404(ViewerProfile, user__username=self.kwargs.get('username'))
     def get_context_data(self,**kwargs):
         context = super().get_context_data(**kwargs)
-        courseenrolled = Course.objects.filter(students__username=self.kwargs['username']).all()
+        courseenrolled = Course.objects.filter(students__username=self.kwargs['username']).order_by('-created').all()
         coursescompleted = []
         ongoing = []
         for course in Course.objects.filter(students__username=self.kwargs['username']).all():
@@ -223,6 +233,19 @@ class ProfileViewerDetail(DetailView):
         context['coursepublished'] = Course.objects.filter(owner__username=self.kwargs['username']).all()
         context['coursecompleted'] = coursescompleted
         context['ongoing'] = ongoing
+        # pagination
+
+        paginator1 = Paginator(coursescompleted, 2)
+        page_number1 = self.request.GET.get('page1')
+        page_obj1 = paginator1.get_page(page_number1)
+        context['page_obj1'] = page_obj1
+
+        # pagination
+
+        paginator2 = Paginator(ongoing,2)
+        page_number2 = self.request.GET.get('page2')
+        page_obj2 = paginator2.get_page(page_number2)
+        context['page_obj2'] = page_obj2
 
         return context
 
@@ -243,9 +266,31 @@ class ProfileCreatorDetail(DetailView):
             else:
                 ongoing.append(course)
                 continue
-        context['coursepublished']=Course.objects.filter(owner__username=self.kwargs['username']).all()
+        context['coursepublished']=Course.objects.filter(owner__username=self.kwargs['username']).order_by('-created').all()
         context['coursecompleted']=coursescompleted
         context['ongoing']=ongoing
+        # pagination
+
+        paginator1= Paginator(Course.objects.filter(owner__username=self.kwargs['username']).order_by('-created').all(), 2)
+        page_number1 = self.request.GET.get('page1')
+        page_obj1 = paginator1.get_page(page_number1)
+        context['page_obj1'] = page_obj1
+
+        # pagination
+
+        paginator2 = Paginator(ongoing, 1)
+        page_number2 = self.request.GET.get('page2')
+        page_obj2 = paginator2.get_page(page_number2)
+        context['page_obj2'] = page_obj2
+
+        # pagination
+
+        paginator3 = Paginator(coursescompleted, 1)
+        page_number3 = self.request.GET.get('page3')
+        page_obj3 = paginator3.get_page(page_number3)
+        context['page_obj3'] = page_obj3
+        print(page_obj3,coursescompleted)
+
 
         return context
 
@@ -276,7 +321,7 @@ def creatorprofile_edit(request):
 def viewerprofile_edit(request):
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=request.user)
-        p_form = CreatorProfileUpdateForm(request.POST,
+        p_form = ViewerProfileUpdateForm(request.POST,
                                    request.FILES,
                                    instance=request.user.vprofile)
         # print('POST',request.POST,'FILE',request.FILES,'USER',request.user,request.user.profile)
@@ -288,7 +333,7 @@ def viewerprofile_edit(request):
 
     else:
         u_form = UserUpdateForm(instance=request.user)
-        p_form = CreatorProfileUpdateForm(instance=request.user.vprofile)
+        p_form = ViewerProfileUpdateForm(instance=request.user.vprofile)
 
     context = {
         'u_form': u_form,
@@ -332,7 +377,7 @@ def creator_following(request,*args,**kwargs):
         else:
             my_profile.following.add(creator.user)
         return redirect(request.META.get('HTTP_REFERER')   )
-    return redirect('profile-detail' , kwargs={ 'post': Post})
+    return redirect('profile-detail' , kwargs={ 'pk': request.POST.get('profile_pk')})
 
 class CreatorProfilenu(DetailView):
     model=CreatorProfile
@@ -353,7 +398,22 @@ class SubjectList(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['course'] = Course.objects.filter(subject_id=self.kwargs['pk']).all()
+        context['course'] = Course.objects.filter(subject_id=self.kwargs['pk']).order_by('-rating').all()
         context['subject'] = Subject.objects.all()
         context['sub']=Subject.objects.get(id=self.kwargs['pk'])
+        paginator = Paginator(Course.objects.filter(subject_id=self.kwargs['pk']).order_by('-rating').all(), 2)
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        context['page_obj'] = page_obj
+
         return context
+
+class ModuleDetail(UserPassesTestMixin,LoginRequiredMixin,DetailView):
+    model= Module
+    template_name='course/moduledetail.html'
+    def test_func(self,**kwargs):
+        module=Module.objects.get(id=self.kwargs['pk'])
+        if self.request.user in module.course.students.all() or self.request.user == module.course.owner:
+            return True
+        else:
+            return False

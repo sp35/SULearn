@@ -38,7 +38,7 @@ class Course(models.Model):
     students = models.ManyToManyField(User,related_name='courses_joined',blank=True)
     rating=models.DecimalField(default=0,decimal_places=2,max_digits=4)
     class Meta:
-        ordering = ['-subject']
+        ordering = ['-created']
 
     def __str__(self):
         return self.title
@@ -51,6 +51,7 @@ class Module(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     date=models.DateTimeField(default=timezone.now)
+    file = models.FileField(blank=True)
     def get_absolute_url(self,**kwargs):
         return reverse('course-detail', kwargs={'pk': self.course.pk})
 

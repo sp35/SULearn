@@ -8,11 +8,19 @@
           <img class="rounded-circle article-img" src="{{ course.owner.cprofile.image.url }}">
           <div class="media-body">
             <div class="article-metadata">
-                <a class="mr-2" href="{% url 'profilecreator' course.owner.username %}">{{ course.owner }}</a>
+                {% if user.is_authenticate %}
+                    <a class="mr-2" href="{% url 'profilecreator' course.owner.username %}">{{course.owner.username}}</a>
+                {% else %}
+                    <a class="mr-2" href="{% url 'creatorprofilenu' course.owner.id %}">{{course.owner.username}}</a>
+                {% endif %}
               <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>     |  Rating - {{ course.rating }}
             </div>
             <h3><a class="article-title" href='{% url 'subjectlist' course.subject.pk %}'>{{ course.subject }}</a></h3>
-            <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
+            {% if user.is_authenticated %}
+                <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
+            {% else %}
+                <h2><a class="article-title" href={% url 'coursenu' course.pk %}>{{ course.title }}</a></h2>
+            {% endif %}
             <p class="article-content">{{ course.overview }}</p>
           </div>
         </article>
@@ -27,12 +35,20 @@
           <img class="rounded-circle article-img" src="{{ course.owner.cprofile.image.url }}">
           <div class="media-body">
             <div class="article-metadata">
-                <a class="mr-2" href="{% url 'profilecreator' course.owner.username %}">{{ course.owner }}</a>
+                {% if user.is_authenticate %}
+                    <a class="mr-2" href="{% url 'profilecreator' course.owner.username %}">{{course.owner.username}}</a>
+                {% else %}
+                    <a class="mr-2" href="{% url 'creatorprofilenu' course.owner.id %}">{{course.owner.username}}</a>
+                {% endif %}
 
               <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>     |  Rating - {{ course.rating }}
             </div>
             <h3><a class="article-title" href='{% url 'subjectlist' course.subject.pk %}'>{{ course.subject }}</a></h3>
-            <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
+            {% if user.is_authenticated %}
+                <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
+            {% else %}
+                <h2><a class="article-title" href={% url 'coursenu' course.pk %}>{{ course.title }}</a></h2>
+            {% endif %}
             <p class="article-content">{{ course.overview }}</p>
           </div>
         </article>
@@ -47,7 +63,11 @@
           <img class="rounded-circle article-img" src="{{ profile.image.url }}">
           <div class="media-body">
             <div class="article-metadata">
-                <a class="mr-2" href="{% url 'profilecreator' profile.user.username %}">{{profile.user.username}}</a>
+                {% if user.is_authenticated %}
+                    <a class="mr-2" href="{% url 'profilecreator' profile.user.username %}">{{profile.user.username}}</a>
+                {% else %}
+                    <a class="mr-2" href="{% url 'creatorprofilenu' profile.user.id %}">{{profile.user.username}}</a>
+                {% endif %}
             </div>
           </div>
         </article>

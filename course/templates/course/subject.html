@@ -1,42 +1,107 @@
+
+
+
+
 {% extends "user/base.html" %}
 {% block content %}
-    <div class="col-md-4">
-          <div class="content-section">
-            <h3>subjects</h3>
-            <p class='text-muted'>
-              <ul class="list-group">
-              {% for subject in subject%}
-                  {{ subject }}
-                  <a href='{% url 'subjectlist' subject.pk %}'>
-                  <li class="list-group-item list-group-item-light">{{ subject.title }}</li>
-                  </a>
-              {% endfor %}
-              </ul>
-            </p>
-          </div>
-    </div>
-    <h2>Courses related to subject {{ sub.title }}</h2>
-    {% for course in course %}
-        <article class="media content-section">
-          <img class="rounded-circle article-img" src="{{ course.owner.cprofile.image.url }}">
-          <div class="media-body">
-            <div class="article-metadata">
+    <div class="grid-container">
+        <div class="body">
+            <div class="rightbody">
                 {% if user.is_authenticated %}
-                    <a class="mr-2" href="{% url 'profilecreator' course.owner.username %}">{{ course.owner }}</a>
-                {% else %}
-                    <a class="mr-2" href="{% url 'creatorprofilenu' course.owner.pk %}">{{ course.owner }}</a>
+
+                    <div class="top">
+                    <h3>Creator Following</h3>
+
+                        <div class="content-section">
+
+                                <p class='text-muted'>
+                                  <ul class="list-group">
+                                  {% if user.cprofile %}
+                                        {% for us in user.cprofile.following.all %}
+                                            <a href='{% url 'profilecreator' us.username %}'>
+                                                <li class="list-group-item list-group-item-light">{{ us.username }}</li><br></a>
+                                        {% endfor %}
+                                  {% endif %}
+                                  {% if user.vprofile %}
+                                        {% for us in user.vprofile.following.all %}
+                                            <a href='{% url 'profilecreator' us.username %}'>
+                                                <li class="list-group-item list-group-item-light">{{ us.username }}</li><br></a>
+                                        {% endfor %}
+                                  {% endif %}
+                                  </ul>
+                                </p>
+                        </div>
+                    </div>
                 {% endif %}
-                <p class="text-primary">rating -{{ course.owner.cprofile.rating }}</p>
-              <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>
             </div>
-            <h3><a class="article-title" href='{% url 'subjectlist' course.subject.pk %}'>{{ course.subject }}</a></h3>
-              {% if user.is_authenticated %}
-                <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
-              {% else %}
-                  <h2><a class="article-title" href={% url 'coursenu' course.pk %}>{{ course.title }}</a></h2>
-              {% endif %}
-            <p class="article-content">{{ course.overview }}</p>
-          </div>
-        </article>
-    {% endfor %}
+
+            <div class="center">
+                <h2>Courses related to {{ sub.title }}</h2>
+                    {% for course in page_obj %}
+                        <article class="media content-section">
+                          <img class="rounded-circle article-img" src="{{ course.owner.cprofile.image.url }}">
+                          <div class="media-body">
+                            <div class="article-metadata">
+                                {% if user.is_authenticated %}
+                                    <a class="mr-2" href="{% url 'profilecreator' course.owner.username %}">{{ course.owner }}</a>
+                                {% else %}
+                                    <a class="mr-2" href="{% url 'creatorprofilenu' course.owner.pk %}">{{ course.owner }}</a>
+                                {% endif %}
+                                <p class="text-primary">creator rating -{{ course.owner.cprofile.rating }}</p>
+                              <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>
+                            </div>
+                            <h3><a class="article-title" href='{% url 'subjectlist' course.subject.pk %}'>{{ course.subject }}</a></h3>
+                            <p class="text-primary">course rating -{{ course.rating }}</p>
+                              {% if user.is_authenticated %}
+                                <h2><a class="article-title" href={% url 'course-detail' course.pk %}>{{ course.title }}</a></h2>
+                              {% else %}
+                                  <h2><a class="article-title" href={% url 'coursenu' course.pk %}>{{ course.title }}</a></h2>
+                              {% endif %}
+                            <p class="article-content">{{ course.overview }}</p>
+                          </div>
+                        </article>
+                    {% endfor %}
+                    <div class="pagination">
+                        <span class="step-links">
+                            {% if page_obj.has_previous %}
+                                <button class="btn btn-danger">
+                                <a href="?page=1">&laquo; first</a></button>
+                                <button class="btn btn-danger">
+                                <a href="?page={{ page_obj.previous_page_number }}">previous</a></button>
+                            {% endif %}
+
+                            <span class="current">
+                                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                            </span>
+
+                            {% if page_obj.has_next %}
+                                <button class="btn btn-danger">
+                                    <a href="?page={{ page_obj.next_page_number }}">next</a></button>
+                                <button class="btn btn-danger">
+                                    <a href="?page={{ page_obj2.paginator.num_pages }}">last &raquo;</a></button>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+            <div class="right">
+
+                <h2>Subjects</h2>
+                    <div class="col-md-4">
+                      <div class="content-section">
+                        <p class='text-muted'>
+                          <ul class="list-group">
+                          {% for subject in subject%}
+                              {{ subject }}
+                              <a href='{% url 'subjectlist' subject.pk %}'>
+                              <li class="list-group-item list-group-item-light">{{ subject.title }}</li>
+                              </a>
+                          {% endfor %}
+                          </ul>
+                        </p>
+                      </div>
+                    </div>
+            </div>
+        </div>
+    </div>
 {% endblock content %}

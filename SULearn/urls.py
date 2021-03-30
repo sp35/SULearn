@@ -24,7 +24,8 @@ from course.views import (
     search,
     creator_following,
     CreatorProfilenu,
-    SubjectList
+    SubjectList,
+    ModuleDetail,
 )
 
 
@@ -49,7 +50,8 @@ urlpatterns = [
     path('results/',search,name='search'),
     path('follow/<pk>/',creator_following,name='creator_following'),
     path('creatorprofile/<pk>/',CreatorProfilenu.as_view(),name='creatorprofilenu'),
-    path('subject/<pk>/',SubjectList.as_view(),name='subjectlist')
+    path('subject/<pk>/',SubjectList.as_view(),name='subjectlist'),
+    path('moduledetail/<pk>/',ModuleDetail.as_view(),name='moduledetail')
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

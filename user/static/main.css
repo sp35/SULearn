@@ -2,7 +2,7 @@
 body {
   background: #fafafa;
   color: #333333;
-  margin-top: 5rem;
+  margin: 30px;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -36,6 +36,7 @@ ul {
   border-radius: 3px;
   margin-bottom: 20px;
 }
+
 
 .article-title {
   color: #444444;
@@ -83,3 +84,52 @@ a.article-title:hover {
 .account-heading {
   font-size: 2.5rem;
 }
+
+html, body, .grid-container { height: 100%; margin: 35px; }
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 3.0fr;
+  gap: 0px;
+  margin: 6px;
+  grid-template-areas:
+    "body";
+}
+
+
+.body {
+  display: grid;
+  grid-template-columns: 0.6fr 1.2fr 1.2fr;
+  grid-template-rows: 1fr;
+  gap: 0px 30px;
+  grid-template-areas:
+    "rightbody center right";
+  grid-area: body;
+
+
+  margin-right: 1px;
+  margin-left: 1px;
+}
+
+.right { grid-area: right; }
+
+
+
+
+.center { grid-area: center; }
+
+.rightbody {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 40px 0px;
+  grid-template-areas:
+    "top"
+    "bottom";
+  grid-area: rightbody;
+}
+
+.top { grid-area: top; }
+
+.bottom { grid-area: bottom; }

@@ -35,7 +35,7 @@
           {% endif %}
           <center><a href={% url 'viewerform' %}>Register as a normal user</a></center>
             <div class="content-section">
-                <form method="POST">
+                <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     <fieldset class="form-group">
                         <legend class="border-bottom mb-4">Blog Post</legend>
