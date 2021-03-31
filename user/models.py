@@ -14,7 +14,7 @@ class ViewerProfile(models.Model):
     state = models.CharField(verbose_name='State', max_length=100)
     doj = models.DateTimeField(default=timezone.now, verbose_name='Date of Joining')
     dob = models.DateTimeField(default=timezone.now, verbose_name='Date of Birth')
-    following = models.ManyToManyField(User,blank=True)
+    following = models.ManyToManyField(User,blank=True,related_name='vfollowing')
     def __str__(self):
         return f'{self.user.username} ViewerProfile'
     def save(self, *args, **kwargs):
@@ -36,7 +36,8 @@ class CreatorProfile(models.Model):
     dob = models.DateTimeField(default=timezone.now,verbose_name='Date of Birth')
     edu = models.TextField(verbose_name='Education Qualification')
     rating=models.DecimalField(default=0,decimal_places=2,max_digits=3)
-    following=models.ManyToManyField(User,blank=True)
+    following=models.ManyToManyField(User,blank=True,related_name='cfollowing')
+    follower=models.ManyToManyField(User,blank=True,related_name='cfollower')
     def __str__(self):
         return f'{self.user.username} CreatorProfile'
     def save(self, *args, **kwargs):

@@ -13,6 +13,7 @@ from allauth.exceptions import ImmediateHttpResponse
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.db.models import Count
 from django.core.paginator import Paginator
+from django.core.exceptions import PermissionDenied
 from .forms import CreatorProfileUpdateForm,ViewerProfileUpdateForm,UserUpdateForm
 
 
@@ -374,10 +375,15 @@ def creator_following(request,*args,**kwargs):
         creator=CreatorProfile.objects.get(user_id=request.POST.get('profile_pk') )
         if creator.user in my_profile.following.all():
             my_profile.following.remove(creator.user)
+            creator.follower.remove(my_profile.user)
+
         else:
             my_profile.following.add(creator.user)
+            creator.follower.add(my_profile.user)
         return redirect(request.META.get('HTTP_REFERER')   )
-    return redirect('profile-detail' , kwargs={ 'pk': request.POST.get('profile_pk')})
+    else:
+        raise PermissionDenied('Go to profile page of creator to follow them')
+
 
 class CreatorProfilenu(DetailView):
     model=CreatorProfile
