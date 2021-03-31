@@ -1,0 +1,87 @@
+{% extends "user/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="grid-container">
+        <div class="body">
+        <div class="rightbody">
+            <div class="top">
+                <h3>subjects</h3>
+                          <div class="content-section">
+
+                            <p class='text-muted'>
+                              <ul class="list-group">
+                              {% for subject in subject%}
+                                  <a href='{% url 'subjectlist' subject.pk %}'>
+                                  <li class="list-group-item list-group-item-light">{{ subject.title }}</li>
+                                  </a><br>
+                              {% endfor %}
+                              </ul>
+                            </p>
+                          </div>
+            </div>
+
+        </div>
+        <div class="center">
+        <h2>Course Details</h2>
+          <article class="media content-section">
+              <img class="rounded-circle article-img" src="{{ course.owner.cprofile.image.url }}">
+              <div class="media-body">
+                <div class="article-metadata">
+                  <a class="mr-2" href='{% url 'creatorprofilenu' course.owner.id %}'>{{ course.owner }}</a>
+
+                  <small class="text-muted">{{ course.created|date:"F d, Y" }}</small>     |  Rating - {{ course.rating }}
+                </div>
+                <h3><a class="article-title" href='{% url 'subjectlist' course.subject.pk %}'>{{ course.subject }}</a></h3>
+                <h2><a class="article-title" href={% url 'coursenu' course.pk %}>{{ course.title }}</a></h2>
+
+                <p class="article-content">{{ course.overview }}</p>
+              </div>
+            {% if user == course.owner %}
+            <button class="btn btn-danger"><a href='{% url 'add-module' course.pk %}'>Add module</a></button>
+            {% endif %}
+            </article>
+            <h2>
+                Login to Enroll and view module content
+            </h2>
+
+        </div>
+            <div class="right">
+            <h2>Reviews</h2>
+            {% for review in page_obj %}
+                <article class="media content-section">
+                      <div class="media-body">
+                        <h2>{{ review.user }}</h2>
+                        <p class="article-content">{{ review.review }}</p>
+                      </div>
+                    </article>
+            {% endfor %}
+            <div class="pagination">
+                        <span class="step-links">
+                            {% if page_obj.has_previous %}
+                                <button class="btn btn-danger">
+                                <a href="?page=1">&laquo; first</a></button>
+                                <button class="btn btn-danger">
+                                <a href="?page={{ page_obj.previous_page_number }}">previous</a></button>
+                            {% endif %}
+
+                            <span class="current">
+                                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                            </span>
+
+                            {% if page_obj.has_next %}
+                                <button class="btn btn-danger">
+                                    <a href="?page={{ page_obj.next_page_number }}">next</a></button>
+                                <button class="btn btn-danger">
+                                    <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a></button>
+                            {% endif %}
+                        </span>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+
+
+
